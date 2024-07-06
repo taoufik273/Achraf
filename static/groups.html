@@ -1,0 +1,83 @@
+
+    <html lang="ar" dir="rtl">
+    <head>
+        <meta charset="UTF-8">
+        <title>توزيع المترشحين</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                direction: rtl;
+            }
+            table {
+                border-collapse: collapse;
+                width: 100%;
+            }
+            th, td {
+                border: 1px solid black;
+                padding: 8px;
+                text-align: center;
+            }
+            th {
+                background-color: #f2f2f2;
+            }
+            input[type="number"] {
+                width: 60px;
+            }
+            button {
+                padding: 10px 20px;
+                font-size: 16px;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>توزيع المترشحين</h1>
+        <form id="statsForm">
+<table dir="rtl">
+<tr><th>يوم الامتحان</th><th>ساعة الامتحان</th><th>عدد المترشحين</th><th>عدد المجموعات</th></tr>
+<tr style="background-color: lightblue;"><td>19/02/2024</td><td>08:30</td><td><strong>120</strong></td><td><input type="number" name="groupes_19/02/2024_08:30" min="1" max="120" required></td></tr>
+<tr style="background-color: lightblue;"><td>19/02/2024</td><td>10:30</td><td><strong>120</strong></td><td><input type="number" name="groupes_19/02/2024_10:30" min="1" max="120" required></td></tr>
+<tr style="background-color: lightgreen;"><td>20/02/2024</td><td>08:30</td><td><strong>120</strong></td><td><input type="number" name="groupes_20/02/2024_08:30" min="1" max="120" required></td></tr>
+<tr style="background-color: lightgreen;"><td>20/02/2024</td><td>10:30</td><td><strong>120</strong></td><td><input type="number" name="groupes_20/02/2024_10:30" min="1" max="120" required></td></tr>
+<tr style="background-color: lightblue;"><td>21/02/2024</td><td>08:30</td><td><strong>144</strong></td><td><input type="number" name="groupes_21/02/2024_08:30" min="1" max="144" required></td></tr>
+<tr style="background-color: lightblue;"><td>21/02/2024</td><td>10:30</td><td><strong>114</strong></td><td><input type="number" name="groupes_21/02/2024_10:30" min="1" max="114" required></td></tr>
+<tr style="background-color: lightgreen;"><td>22/02/2024</td><td>08:30</td><td><strong>130</strong></td><td><input type="number" name="groupes_22/02/2024_08:30" min="1" max="130" required></td></tr>
+<tr style="background-color: lightgreen;"><td>22/02/2024</td><td>10:30</td><td><strong>120</strong></td><td><input type="number" name="groupes_22/02/2024_10:30" min="1" max="120" required></td></tr>
+<tr style="background-color: lightblue;"><td>23/02/2024</td><td>08:30</td><td><strong>112</strong></td><td><input type="number" name="groupes_23/02/2024_08:30" min="1" max="112" required></td></tr>
+<tr style="background-color: lightblue;"><td>23/02/2024</td><td>10:30</td><td><strong>121</strong></td><td><input type="number" name="groupes_23/02/2024_10:30" min="1" max="121" required></td></tr>
+</table>
+<button type="submit" style="margin-top: 20px;">حفظ</button>
+</form>
+
+        <script>
+        document.getElementById('statsForm').onsubmit = function(e) {
+            e.preventDefault();
+            var formData = new FormData(this);
+            var result = {};
+            for (var [key, value] of formData.entries()) {
+                result[key] = value;
+            }
+            fetch('/save_data', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(result),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.success) {
+                    alert('تم حفظ البيانات بنجاح');
+                } else {
+                    alert('حدث خطأ أثناء حفظ البيانات: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('حدث خطأ أثناء حفظ البيانات');
+            });
+        }
+        </script>
+        
+    </body>
+    </html>
+    

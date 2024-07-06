@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>تدبير اختبارات الباكالوريا أحرار لمادة التربية البدنية</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #FFF6E9;
+            font-family: Tajwal, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .toolbar {
+            display: flex;
+            background-color: #FFF6E9;
+            padding: 8px;
+            width: 950px;
+            justify-content: center;
+        }
+        .tool {
+            position: relative;
+        }
+        .tool-button {
+            background-color: #444;
+            color: white;
+            border: none;
+            padding: 10px 40px;
+            margin: 0 5px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .tool-button:hover {
+            background-color: #222;
+        }
+        .submenu {
+            display: none;
+            position: absolute;
+            top: 40px;
+            left: 0;
+            background-color: #444;
+            border: 1px solid #333;
+            z-index: 1;
+        }
+        .subtool-button {
+            background-color: #555;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .subtool-button:hover {
+            background-color: #666;
+        }
+        .tool:hover .submenu {
+            display: block;
+        }
+        .container {
+            width: 750px;
+            height: 500px;
+            margin: 20px 0;
+            position: relative;
+            display: flex;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .frame {
+            position: absolute;
+        }
+        #F1 {
+            width: 750px;
+            height: 500px;
+            background-color: silver;
+            left: 0;
+            top: 0;
+        }
+        #F4 {
+            width: 250px;
+            height: 100px;
+            background-color: silver;
+            left: 300px;
+            top: 330px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .year-label {
+            font-family: 'Rubic', sans-serif;
+            font-size: 40px;
+            color: #114232;
+        }
+        #title4 {
+            font-family: 'Rubic', sans-serif;
+            font-size: 44px;
+            color: #114232;
+            position: absolute;
+            left: 520px;
+            top: 350px;
+            width: 3em;
+            text-align: center;
+            background-color: silver;
+        }
+        #status {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: none;
+            font-family: 'Tajwal', sans-serif;
+        }
+    </style>
+    <script>
+        function executeScript(scriptName) {
+            fetch(`/execute/${scriptName}`, {
+                method: 'POST'
+            })
+            .then(response => {
+                if (response.status === 200) {
+                    return response.json();
+                }
+                console.log('Réponse inattendue:', response.status);
+            })
+            .then(data => {
+                if (data && data.redirect) {
+                    console.log('Redirection vers:', data.redirect);
+                    window.location.href = data.redirect;
+                } else {
+                    console.log('Pas de redirection dans la réponse');
+                }
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('import').addEventListener('click', () => executeScript('import'));
+            document.getElementById('app').addEventListener('click', () => executeScript('app'));
+            document.getElementById('calculate').addEventListener('click', () => executeScript('calculate'));
+            document.getElementById('NF').addEventListener('click', () => executeScript('NF'));
+            document.getElementById('zero').addEventListener('click', () => executeScript('zero'));
+            document.getElementById('allnotes').addEventListener('click', () => executeScript('allnotes'));
+            document.getElementById('setting').addEventListener('click', () => executeScript('setting'));
+            document.getElementById('groups').addEventListener('click', () => executeScript('groups'));
+            document.getElementById('intervenant').addEventListener('click', () => executeScript('intervenant'));
+            document.getElementById('liste').addEventListener('click', () => executeScript('liste'));
+            document.getElementById('gym_card').addEventListener('click', () => executeScript('gymcard'));
+            document.getElementById('trace').addEventListener('click', () => executeScript('trace'));
+            document.getElementById('dispence').addEventListener('click', () => executeScript('dispence'));
+            document.getElementById('exportnote').addEventListener('click', () => executeScript('exportnote'));
+            document.getElementById('presence').addEventListener('click', () => executeScript('presence'));
+            document.getElementById('stat').addEventListener('click', () => executeScript('stat'));
+            document.getElementById('about').addEventListener('click', () => {
+                window.location.href = '/about';
+            });
+        });
+    </script>
+</head>
+<body>
+    <div class="toolbar">
+        <div class="tool">
+            <button id="settings" class="tool-button">إعدادات</button>
+            <div class="submenu">
+                <button id="zero" class="subtool-button">تصفير البرنامج</button>
+                <button id="setting" class="subtool-button">تحيين المعطيات</button>
+                <button id="import" class="subtool-button">استيراد لوائح المترشحين</button>
+                <button id="groups" class="subtool-button">توزيع المترشحين</button>
+                <button id="intervenant" class="subtool-button">استيراد لائحة المتدخلين</button>
+            </div>
+        </div>
+        <div class="tool">
+            <button id="input" class="tool-button">إدخال</button>
+            <div class="submenu">
+                <button id="app" class="subtool-button">إنجازات المترشحين</button>
+                <button id="calculate" class="subtool-button">حساب المعدلات</button>
+            </div>
+        </div>
+        <div class="tool">
+            <button id="export" class="tool-button">تصدير</button>
+            <div class="submenu">
+                <button id="liste" class="subtool-button">  لوائح المترشحين Format A3 </button>
+                <button id="gym_card" class="subtool-button"> بطاقة الجمناستيك</button>
+                <button id="trace" class="subtool-button"> بطاقة التنقيط</button>
+                <button id="NF" class="subtool-button">المحضر الجماعي</button>
+                <button id="allnotes" class="subtool-button">محضر النقط</button>
+                <button id="exportnote" class="subtool-button"> النقط Format Excel</button>
+                <button id="dispence" class="subtool-button">لائحة الإعفاءات</button>
+                <button id="presence" class="subtool-button">لائحة حضور المتدخلين</button>
+            </div>
+        </div>
+        <div class="tool">
+            <button id="misc" class="tool-button">مختلفات</button>
+            <div class="submenu">
+                <button id="stat" class="subtool-button">إحصاء كلي</button>
+                <button id="about" class="subtool-button">عن البرنامج</button>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div id="F1" class="frame">
+            <img src="img/logo.png" alt="Logo" style="width:100%; height:100%;">
+        </div>
+        <div id="F4" class="frame">
+            <div class="year-label"><strong>{{ section }}</strong></div>
+        </div>
+        <div id="title4"><strong>دورة</strong></div>
+    </div>
+    <div id="status"></div>
+</body>
+</html>
