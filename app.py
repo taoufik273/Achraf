@@ -1,6 +1,6 @@
 import os
 import sys
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify, send_from_directory, render_template
 import sqlite3
 from flask_cors import CORS
 
@@ -50,6 +50,52 @@ def init_app(app):
     @app.route('/index')
     def index():
         return send_from_directory(os.path.join(application_path, 'static'), 'index.html')
+
+    @app.route('/setting')
+    def saisie():
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM 'index2' LIMIT 1")
+        row = cur.fetchone()
+        conn.close()
+        
+        if row:
+            data = ['' if item is None else str(item) for item in row]
+        else:
+            data = [''] * 6
+        
+        return render_template('setting.html', data=data)
+
+    @app.route('/api/data', methods=['POST'])
+    def saisie_updait():
+        conn = get_db_connection()
+        cur = conn.cursor()
+        
+        try:
+            annee = request.form.get('annee', '')
+            centre = request.form.get('centre', '')
+            inspecteur = request.form.get('inspecteur', '')
+            membre = request.form.get('membre', '')
+            membre1 = request.form.get('membre1', '')
+            section = request.form.get('section', '')
+            
+            cur.execute("SELECT COUNT(*) FROM 'index2'")
+            count = cur.fetchone()[0]
+            
+            if count == 0:
+                cur.execute("INSERT INTO 'index2' (annee, centre, inspecteur, membre, membre1, section) VALUES (?, ?, ?, ?, ?, ?)",
+                            (annee, centre, inspecteur, membre, membre1, section))
+            else:
+                cur.execute("UPDATE 'index2' SET annee=?, centre=?, inspecteur=?, membre=?, membre1=?, section=?",
+                            (annee, centre, inspecteur, membre, membre1, section))
+            
+            conn.commit()
+            return jsonify({'success': True, 'message': 'تم تحديث البيانات بنجاح'})
+        except Exception as e:
+            conn.rollback()
+            return jsonify({'success': False, 'error': str(e)})
+        finally:
+            conn.close()
 
     return app
 

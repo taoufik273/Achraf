@@ -23,6 +23,9 @@ from scripts import groups, stat, importer, intervenant
 # Importer le blueprint zero
 from scripts.zero import zero_bp
 
+
+
+
 server = Flask(__name__, 
                static_folder=os.path.join(application_path, 'static'), 
                template_folder=os.path.join(application_path, 'web'))
