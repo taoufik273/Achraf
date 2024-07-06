@@ -1,75 +1,59 @@
+# scripts/intervenant.py
 import os
-import sys
-from tkinter import Tk, filedialog, messagebox
 import pandas as pd
 import sqlite3
+from flask import flash, redirect, request
 
-def resource_path(relative_path):
-    """ Obtenir le chemin absolu vers la ressource, fonctionne pour dev et pour PyInstaller """
-    try:
-        # PyInstaller crée une variable temporaire pour stocker le chemin d'accès aux fichiers.
-        base_path = sys._MEIPASS
-    except Exception:
-        base_path = os.path.abspath(".")
-    return os.path.join(base_path, relative_path)
-
-def importer_donnees():
-    # Créer une fenêtre principale Tkinter cachée
-    root = Tk()
-    root.withdraw()  # Masquer la fenêtre principale
+def importer_intervenant():
+    if 'file' not in request.files:
+        flash('Aucun fichier sélectionné', 'error')
+        return redirect(request.url)
     
-    # Ouvrir une boîte de dialogue pour sélectionner le fichier Excel
-    filename = filedialog.askopenfilename(filetypes=[("Excel files", "*.xlsx;*.xls")], parent=root)
+    file = request.files['file']
     
-    # Si aucun fichier n'est sélectionné, retourner
-    if not filename:
-        return
+    if file.filename == '':
+        flash('Aucun fichier sélectionné', 'error')
+        return redirect(request.url)
     
-    try:
-        # Lire le fichier Excel
-        df = pd.read_excel(filename)
-        
-        # Connexion à la base de données SQLite
-        db_path = resource_path('data/saisie.db')
-        conn = sqlite3.connect(db_path)
-        cursor = conn.cursor()
+    if file:
+        try:
+            # Lire le fichier Excel
+            df = pd.read_excel(file)
+            
+            # Connexion à la base de données SQLite
+            db_path = os.path.join(os.path.dirname(__file__), '../data/saisie.db')
+            conn = sqlite3.connect(db_path)
+            cursor = conn.cursor()
 
-        
+            # Préparation de la requête d'insertion
+            insert_query = '''
+            INSERT INTO intervenant (numero, nom, ppr, travail, code, mission)
+            VALUES (?, ?, ?, ?, ?, ?)
+            '''
 
-        
+            # Conversion des données du DataFrame en liste de tuples
+            data_to_insert = df.values.tolist()
 
-        # Préparation de la requête d'insertion
-        insert_query = '''
-        INSERT INTO intervenant (numero, nom, ppr, travail, code, mission)
-        VALUES (?, ?, ?, ?, ?, ?)
-        '''
+            # Vérifier et insérer les données une par une pour éviter les doublons
+            for record in data_to_insert:
+                ppr = record[2]  # Assuming ppr is the third column
+                cursor.execute('SELECT COUNT(*) FROM intervenant WHERE ppr = ?', (ppr,))
+                if cursor.fetchone()[0] == 0:
+                    cursor.execute(insert_query, record)
 
-        # Conversion des données du DataFrame en liste de tuples
-        data_to_insert = df.values.tolist()
+            # Commit the transaction
+            conn.commit()
 
-        # Vérifier et insérer les données une par une pour éviter les doublons
-        for record in data_to_insert:
-            cursor.execute('SELECT COUNT(*) FROM intervenant WHERE ppr = ?', (record[2],))
-            if cursor.fetchone()[0] == 0:
-                cursor.execute(insert_query, record)
+            # Fermeture de la connexion
+            cursor.close()
+            conn.close()
 
-        # Commit the transaction
-        conn.commit()
+            # Afficher un message de succès (utilisation de flash pour Flask)
+            flash('تم الاستيراد بنجاح', 'ممتاز')
 
-        # Fermeture de la connexion
-        cursor.close()
-        conn.close()
+        except Exception as e:
+            # Afficher un message d'erreur en cas de problème
+            flash(f"Erreur lors de l'importation des intervenants : {str(e)}", 'error')
 
-        # Afficher un message de succès
-        messagebox.showinfo("ممتاز", "تم الاستيراد بنجاح", parent=root)
-
-    except Exception as e:
-        # Afficher un message d'erreur en cas de problème
-        messagebox.showerror("Erreur", "Une erreur s'est produite lors de l'importation: " + str(e), parent=root)
-
-    # Détruire la fenêtre principale après utilisation
-    root.destroy()
-
-# Appel de la fonction importer_donnees() au démarrage du script
-if __name__ == "__main__":
-    importer_donnees()
+    # Rediriger vers la page d'importation ou toute autre page nécessaire
+    return redirect('/intervenant')

@@ -20,6 +20,8 @@ def clear_tables():
         # Vider le contenu des tables 'saisie' et 'notes'
         c.execute("DELETE FROM saisie")
         c.execute("DELETE FROM notes")
+        c.execute("DELETE FROM liste")
+        c.execute("DELETE FROM intervenant")
         conn.commit()
         return True
     except sqlite3.Error as e:

@@ -1,9 +1,9 @@
 import os
 import sys
 import webbrowser
-from flask import Flask, send_from_directory, jsonify, request, render_template, redirect, url_for, flash
 import subprocess
 import sqlite3
+from flask import Flask, send_from_directory, jsonify, request, render_template, redirect, flash
 
 # Déterminer le chemin de base de l'application
 if getattr(sys, 'frozen', False):
@@ -18,7 +18,7 @@ sys.path.insert(0, application_path)
 # Importer les modules locaux
 import app
 import setting 
-from scripts import groups, stat, importer
+from scripts import groups, stat, importer, intervenant
 
 # Importer le blueprint zero
 from scripts.zero import zero_bp
@@ -67,7 +67,7 @@ def execute_script(script_name):
         'dispence': 'dispence.py',
         'exportnote': 'exportnote.py',
         'trace': 'trace.py',
-        'intervenant': 'intervenant.py',
+        'intervenant': None,
         'presence': 'presence.py',
         'liste': 'liste.py',
         'setting': None,
@@ -86,6 +86,8 @@ def execute_script(script_name):
             return jsonify({'redirect': '/stat'}), 200
         elif script_name == 'import':
             return jsonify({'redirect': '/import'}), 200
+        elif script_name == 'intervenant':
+            return jsonify({'redirect': '/intervenant'}), 200
         elif script_name == 'zero':
             return jsonify({'redirect': '/zero/'}), 200
         elif script_map[script_name]:
@@ -114,6 +116,12 @@ def import_route():
     if request.method == 'POST':
         return importer.importer_donnees()
     return render_template('import.html')
+
+@server.route('/intervenant', methods=['GET', 'POST'])
+def intervenant_route():
+    if request.method == 'POST':
+        return intervenant.importer_intervenant()
+    return render_template('intervenant.html')
 
 @server.route('/save_data', methods=['POST'])
 def save_data_route():
