@@ -10,7 +10,7 @@ if getattr(sys, 'frozen', False):
 else:
     application_path = os.path.dirname(os.path.abspath(__file__))
 
-DATABASE = os.path.join(application_path, 'data', 'saisie.db')
+DATABASE = os.path.join(os.path.dirname(__file__), 'data/saisie.db')
 
 def get_db_connection():
     try:
