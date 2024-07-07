@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> حساب المعدلات</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        #executeButton {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        #executeButton:hover {
+            background-color: #45a049;
+        }
+        #executeButton:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        #loadingMessage {
+            display: none;
+            color: #2196F3;
+            margin-top: 20px;
+        }
+        #successMessage {
+            display: none;
+            color: #4CAF50;
+            margin-top: 20px;
+        }
+        #errorMessage {
+            display: none;
+            color: #f44336;
+            margin-top: 20px;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: #2196F3;
+            text-decoration: none;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1> حساب المعدلات</h1>
+        <p>اضغط على الزر لحساب المعدلات حتى يتيح تصدير المحاضر</p>
+        <form id="calculateForm">
+            <button type="submit" id="executeButton">تنفيذ </button>
+        </form>
+
+        <div id="loadingMessage">يرجى الانتظار، جاري حساب المعدلات ...</div>
+        <div id="successMessage"></div>
+        <div id="errorMessage"></div>
+
+        <a href="/" class="back-link">العودة إلى الصفحة الرئيسية</a>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        document.getElementById('calculateForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            var loadingMessage = document.getElementById('loadingMessage');
+            var successMessage = document.getElementById('successMessage');
+            var errorMessage = document.getElementById('errorMessage');
+            var executeButton = document.getElementById('executeButton');
+
+            loadingMessage.style.display = 'block';
+            successMessage.style.display = 'none';
+            errorMessage.style.display = 'none';
+            executeButton.disabled = true;
+
+            axios.post('/execute_calculate')
+                .then(function(response) {
+                    loadingMessage.style.display = 'none';
+                    if (response.data && response.data.message) {
+                        successMessage.innerText = response.data.message;
+                        successMessage.style.display = 'block';
+                    } else {
+                        successMessage.innerText = 'تم حساب المعدلات بنجاح.';
+                        successMessage.style.display = 'block';
+                    }
+                })
+                .catch(function(error) {
+                    loadingMessage.style.display = 'none';
+                    console.error('Error executing calculate.py:', error);
+                    errorMessage.innerText = 'خطأ في تنفيذ calculate.py: ' + (error.response ? error.response.data.error : error.message);
+                    errorMessage.style.display = 'block';
+                })
+                .finally(function() {
+                    executeButton.disabled = false;
+                });
+        });
+    </script>
+</body>
+</html>

@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -16,18 +15,18 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      background-color: white;
+      background-color: #e0f7e0; /* Couleur verte claire */
       padding: 10px 0;
-      position: sticky;
-      top: 0;
-      z-index: 1000;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
     #filter-container {
       display: flex;
       justify-content: center;
+      align-items: center;
       margin-bottom: 20px;
+      position: relative;
+      width: 100%;
     }
 
     #filter-container div {
@@ -41,9 +40,28 @@
     button {
       display: block;
       margin: 10px 5px;
-      padding: 10px 20px;
-      font-size: 16px;
+      padding: 12px 25px; /* Augmenter la taille des boutons */
+      font-size: 18px;
+      font-weight: bold; /* Boutons en gras */
       cursor: pointer;
+    }
+
+    a {
+      color: #00bfff; /* Bleu ciel */
+      font-size: 14px; /* Taille plus petite que les boutons et filtres */
+      text-decoration: none;
+      margin-left: auto;
+      margin-right: 20px; /* Espacement entre le lien et les boutons */
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .table-container {
+      width: 100%;
+      overflow-y: auto;
+      height: 70vh; /* Hauteur de la zone défilante */
     }
 
     table {
@@ -64,6 +82,9 @@
 
     th {
       background-color: #f2f2f2;
+      position: sticky;
+      top: 0;
+      z-index: 10;
     }
 
     input[type="text"] {
@@ -94,24 +115,29 @@
         </select>
       </div>
       <button onclick="applyFilters()">كشف المعطيات</button>
-      <button onclick="saveData()">حفظ المعطبات</button>
-    </div>
+      <button onclick="saveData()">حفظ المعطيات</button>
+      </div>
+  <div>
+    <a href="http://127.0.0.1:5000/">العودة إلى الصفحة الرئيسية</a></div>
   </div>
-  <table id="data-table"  style="display:none;">
-    <thead>
-      <tr>
-        <th>رت</th>
-        <th>يوم الامتحان</th>
-        <th>ساعة الامتحان</th>
-        <th>الاسم والنسب</th>
-        <th>الجمباز</th>
-        <th>الجري السريع</th>
-        <th>دفع الجلة</th>
-        <th>القفز الطويل</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+  </div>
+  <div class="table-container">
+    <table id="data-table" style="display:none;">
+      <thead>
+        <tr>
+          <th>رت</th>
+          <th>يوم الامتحان</th>
+          <th>ساعة الامتحان</th>
+          <th>الاسم والنسب</th>
+          <th>الجمباز</th>
+          <th>الجري السريع</th>
+          <th>دفع الجلة</th>
+          <th>القفز الطويل</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -123,10 +149,10 @@
       const result = await response.json();
       const jourFilter = document.getElementById('filter-jour');
       const heureFilter = document.getElementById('filter-heure');
-      
+
       const uniqueJours = [...new Set(result.map(item => item.jour))];
       const uniqueHeures = [...new Set(result.map(item => item.heure))];
-      
+
       uniqueJours.forEach(jour => {
         const option = document.createElement('option');
         option.text = jour;
@@ -143,7 +169,7 @@
     async function applyFilters() {
       const jourFilter = document.getElementById('filter-jour').value;
       const heureFilter = document.getElementById('filter-heure').value;
-      
+
       const response = await fetch('http://127.0.0.1:5000/api/data');
       const result = await response.json();
       const filteredData = result.filter(item => {

@@ -1,0 +1,6 @@
+DEBUG:root:Starting remplir_et_convertir_et_importer
+DEBUG:root:Opening Excel file: INPUT/note.xlsx
+DEBUG:root:Saving Excel file: OUTPUT/note_temp.xlsx
+DEBUG:root:Recalculating formulas
+DEBUG:root:Saving recalculated Excel file: OUTPUT/note.xlsx
+DEBUG:root:Finished remplir_et_convertir_et_importer

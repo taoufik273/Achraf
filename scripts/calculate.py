@@ -1,8 +1,6 @@
 import os
 from pathlib import Path
 import xlwings as xw  
-import tkinter as tk
-from tkinter import messagebox
 import sqlite3
 import openpyxl
 import datetime
@@ -110,7 +108,7 @@ def remplir_et_convertir_et_importer():
     conn.commit()
     conn.close()
 
-    messagebox.showinfo("ممتاز", "تم حساب المعدلات بنجاح")
+
 
 # Appel de la fonction telecharger_NF() au démarrage du script
 if __name__ == "__main__":

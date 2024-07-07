@@ -16,15 +16,12 @@ sys.path.append(os.path.join(application_path, 'scripts'))
 sys.path.insert(0, application_path)
 
 # Importer les modules locaux
-import app
+import saisie
 import setting 
-from scripts import groups, stat, importer, intervenant
+from scripts import groups, stat, importer, intervenant, calculate
 
 # Importer le blueprint zero
 from scripts.zero import zero_bp
-
-
-
 
 server = Flask(__name__, 
                static_folder=os.path.join(application_path, 'static'), 
@@ -39,7 +36,8 @@ server.register_blueprint(zero_bp, url_prefix='/zero')
 def serve_img(filename):
     return send_from_directory(os.path.join(application_path, 'img'), filename)
 
-app.init_app(server)
+with server.app_context():
+    saisie.init_app(server)
 setting.init_app(server)
 
 @server.route('/')
@@ -62,8 +60,8 @@ def start_page():
 def execute_script(script_name):
     script_map = {
         'import': None,
-        'app': None,
-        'calculate': 'calculate.py',
+        'saisie': None,
+        'calculate': None,
         'NF': 'NF.py',
         'zero': None,
         'stat': 'stat.py',
@@ -79,7 +77,8 @@ def execute_script(script_name):
     }
     
     if script_name in script_map:
-        if script_name == 'app':
+        # Gestion des redirections spécifiques
+        if script_name == 'saisie':
             return jsonify({'redirect': '/index'}), 200
         elif script_name == 'setting':
             return jsonify({'redirect': '/login'}), 200
@@ -87,12 +86,16 @@ def execute_script(script_name):
             return jsonify({'redirect': '/groups'}), 200
         elif script_name == 'stat':
             return jsonify({'redirect': '/stat'}), 200
+        elif script_name == 'calculate':
+            return jsonify({'redirect': '/calculate'}), 200
         elif script_name == 'import':
             return jsonify({'redirect': '/import'}), 200
         elif script_name == 'intervenant':
             return jsonify({'redirect': '/intervenant'}), 200
         elif script_name == 'zero':
             return jsonify({'redirect': '/zero/'}), 200
+        
+        # Exécution du script via subprocess
         elif script_map[script_name]:
             try:
                 subprocess.run([sys.executable, os.path.join(application_path, 'scripts', script_map[script_name])], 
@@ -104,10 +107,26 @@ def execute_script(script_name):
     
     return jsonify({}), 204
 
+
 @server.route('/groups')
 def groups_route():
     groups.generer_groups_html()
     return send_from_directory(server.static_folder, 'groups.html')
+
+@server.route('/calculate')
+def calculate_page():
+    return render_template('calculate.html')
+
+@server.route('/execute_calculate', methods=['POST'])
+def execute_calculate():
+    try:
+        subprocess.run([sys.executable, os.path.join(application_path, 'scripts', 'calculate.py')], 
+                       capture_output=True, text=True, check=True)
+        return jsonify({'message': 'تم حساب المعدلات بنجاح.'}), 200
+    except subprocess.CalledProcessError as e:
+        server.logger.error(f"Error executing calculate.py: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
 
 @server.route('/stat')
 def stat_route():
@@ -138,7 +157,7 @@ def about_page():
 def download_file(filename):
     return send_from_directory(os.path.join(application_path, 'INPUT'), filename, as_attachment=True)
 
-# Nouvelles routes pour le système de login et setting
+# Routes pour le système de login et setting
 @server.route('/login', methods=['GET', 'POST'])
 def login():
     return setting.login()
